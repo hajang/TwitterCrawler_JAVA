@@ -1,19 +1,26 @@
 //
 // Created by Ha on 16. 1. 13..
 //
+// Updated by Ha on 16. 1. 15..
 
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
 
+import java.util.ArrayList;
+
 // 트위터 stream API를 이용하여 실시간 트윗중에 특정 문자열을 필터링하여 crawling 하는 프로그램
+// stanford NLP 라이브러리를 이용한 감성분석기 추가
 // 아래 TOKEN과 KEY를 채워 넣어야 함.
 public class Main {
+    
+
     private static final String ACCESS_TOKEN = "";
     private static final String ACCESS_SECRET = "";
     private static final String CONSUMER_KEY = "";
     private static final String CONSUMER_SECRET = "";
 
-    public static void main(String[] args) {
+    // main for twitter crawler
+    public static void TweetCrawler_main(String[] args) {
 
         // TOA 설정
         ConfigurationBuilder cb = new ConfigurationBuilder();
@@ -66,7 +73,7 @@ public class Main {
         FilterQuery fq = new FilterQuery();
 
         // 필터링할 문자열
-        String keywords[] = {"obama", "박근혜"};
+        String keywords[] = {"박근혜"};
 
         // 필터에 문자열 추가
         fq.track(keywords);
@@ -84,5 +91,27 @@ public class Main {
 
     public static void print(String s){
         System.out.print(s);
+    }
+
+
+    // main for sentiment analysis
+    public static void main(String[] args) {
+
+        // TOA 설정
+        ConfigurationBuilder cb = new ConfigurationBuilder();
+        cb.setDebugEnabled(true)
+                .setOAuthConsumerKey(CONSUMER_KEY)
+                .setOAuthConsumerSecret(CONSUMER_SECRET)
+                .setOAuthAccessToken(ACCESS_TOKEN)
+                .setOAuthAccessTokenSecret(ACCESS_SECRET);
+
+        // initialize the pipeline and feed tweets into the sentiment analyzer, one at a time
+        String topic = "iphone";
+        ArrayList<String> tweets = TweetManager.getTweets(topic, cb);
+        NLP.init();
+        for(String tweet : tweets) {
+            System.out.println(tweet + " : " + NLP.findSentiment(tweet));
+        }
+
     }
 }
